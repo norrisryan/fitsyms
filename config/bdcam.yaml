@@ -1,0 +1,71 @@
+# FITSYMS configuration: BD Cam
+# -----------------------------------------------------------------------
+# BD Cam is a symbiotic binary with a well-measured astrometric inclination
+# from Hipparcos (Pourbaix & Jorissen 2000, HIP 17296).
+# [Fe/H] from Charbonnel+2020 (A&A 633 A34) spectroscopy.
+# Distance from Gaia EDR3 Bailer-Jones+2021 (RUWE elevated; treat with caution).
+# -----------------------------------------------------------------------
+
+name: "BD Cam"
+
+mist_dir: "~/.isochrones/mist/MIST_v1.2_vvcrit0.4_full_isos"
+gardner_factor: 1.0054
+
+angular_diameter:
+  theta_mas: 5.39
+  err_lo: 0.06
+  err_hi: 0.08
+
+distance:
+  dist_pc: 235.43
+  err_lo: 13.35
+  err_hi: 13.35
+  source: "Gaia EDR3 Bailer-Jones+2021"
+  note: "High RUWE; DR2 (182 pc) vs EDR3 (235 pc) tension noted"
+
+spectroscopy:
+  teff: 3597
+  teff_err: 118
+  av: 0.134
+  av_err: 0.129
+  feh_starfish: -0.101
+  feh_starfish_err: 0.242
+
+# Charbonnel+2020 [Fe/H] = -0.20 ± 0.10 from ~30 Fe lines, R>=43000.
+# Caveats: Teff feeding the fit is photometric (150 K uncertainty);
+# [Fe/H] scale runs 0.1-0.3 dex low (microturbulence), so corrected
+# value ~ -0.1 to 0.0, consistent with Starfish -0.10.
+feh_prior:
+  kind: truncated_gaussian
+  mu: -0.20
+  sigma: 0.10
+  feh_lo: -1.0
+  feh_hi: +0.5
+  cite: "Charbonnel et al. (2020)"
+
+companion_prior:
+  kind: flat
+  lo: 0.30               # WD companion; 0.30 floor admits He WDs
+  hi: 1.44
+
+# Astrometric inclination: Pourbaix & Jorissen (2000), Table 2, HIP 17296.
+# i = 109.0 ± 6.5 deg.  sin(109) = sin(71) so effectively high inclination.
+incl_prior:
+  kind: gaussian_deg
+  incl_deg: 109.0
+  incl_err_deg: 6.5
+  cite: "Pourbaix & Jorissen (2000)"
+
+orbit:
+  has_orbit: true
+  fm: 0.037
+  fm_err: 0.003
+  period_d: 596.21
+  period_err_d: 0.19
+  ecc: 0.088
+  ecc_err: 0.023
+
+inference:
+  n_samples: 10000000
+  k_neighbors: 16
+  rng_seed: 20260501

@@ -1,0 +1,69 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "fitsyms"
+version = "0.1.0"
+description = "Joint giant-mass and Roche-lobe filling-factor inference via MIST isochrones and spectroscopic mass functions"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Ryan Norris", email = "" },
+]
+keywords = [
+    "astronomy",
+    "astrophysics",
+    "symbiotic binaries",
+    "stellar mass",
+    "isochrones",
+    "interferometry",
+    "Roche lobe",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "pandas>=2.0",
+    "h5py>=3.8",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+plots = [
+    "corner>=2.2",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+]
+
+[project.urls]
+Homepage = "https://github.com/YOUR_USERNAME/fitsyms"
+Repository = "https://github.com/YOUR_USERNAME/fitsyms"
+"Bug Tracker" = "https://github.com/YOUR_USERNAME/fitsyms/issues"
+
+[project.scripts]
+fitsyms = "fitsyms.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fitsyms*"]
+
+[tool.setuptools.package-data]
+fitsyms = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"

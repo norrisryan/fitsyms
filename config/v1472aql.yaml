@@ -1,0 +1,70 @@
+# FITSYMS configuration: V1472 Aql
+# -----------------------------------------------------------------------
+# V1472 Aql is an SS Lep-type interacting binary (M giant + MS companion)
+# with no symbiotic emission signature.  No external [Fe/H] exists; the
+# Hayden+2015 solar-annulus disc MDF prior is adopted.
+# Distance from Gaia EDR3 Bailer-Jones+2021.
+# -----------------------------------------------------------------------
+
+name: "V1472 Aql"
+
+mist_dir: "~/.isochrones/mist/MIST_v1.2_vvcrit0.4_full_isos"
+gardner_factor: 1.0054
+
+angular_diameter:
+  theta_mas: 2.44
+  err_lo: 0.05
+  err_hi: 0.05
+
+distance:
+  dist_pc: 247.62
+  err_lo: 4.0
+  err_hi: 5.0
+  source: "Gaia EDR3 Bailer-Jones+2021"
+
+spectroscopy:
+  teff: 3624
+  teff_err: 117
+  av: 0.607
+  av_err: 0.090
+  feh_starfish: 0.015
+  feh_starfish_err: 0.259
+
+# No external [Fe/H]: Hayden+2015 solar-annulus disc MDF.
+# Target is < 1 kpc so a single local MDF applies.
+feh_prior:
+  kind: truncated_gaussian
+  mu: +0.02              # Hayden+2015 solar-annulus MDF peak
+  sigma: 0.20            # representative solar-annulus width
+  feh_lo: -1.0
+  feh_hi: +0.5
+  cite: "Hayden et al. (2015)"
+
+# MS companion (SS Lep type): upper bound widened to cover F/A-type companions.
+# The mass-function + MIST constraint cuts the M2 posterior off well below
+# the prior upper bound in practice.
+companion_prior:
+  kind: flat
+  lo: 0.30
+  hi: 3.00
+
+# Eclipsing system: i > ~50 deg (lower bound from eclipse duration).
+# Correct geometric prior (cos i uniform).
+incl_prior:
+  kind: isotropic_truncated
+  incl_min: 50.0
+  incl_max: 90.0
+
+orbit:
+  has_orbit: true
+  fm: 0.045
+  fm_err: 0.003
+  period_d: 198.716
+  period_err_d: 0.038
+  ecc: 0.048
+  ecc_err: 0.016
+
+inference:
+  n_samples: 10000000
+  k_neighbors: 16
+  rng_seed: 20260501

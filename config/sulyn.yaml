@@ -1,0 +1,73 @@
+# FITSYMS configuration: SU Lyn
+# -----------------------------------------------------------------------
+# SU Lyn is a symbiotic binary without a measured orbital period; the mass
+# function constraint is not available.  FITSYMS returns the MIST giant-mass
+# posterior only, which is compared (not fitted) to Ilkiewicz+2022.
+# SU Lyn is on the TP-AGB; MIST carries larger systematic uncertainty there.
+# -----------------------------------------------------------------------
+
+name: "SU Lyn"
+
+mist_dir: "~/.isochrones/mist/MIST_v1.2_vvcrit0.4_full_isos"
+gardner_factor: 1.0054
+
+angular_diameter:
+  theta_mas: 3.41
+  err_lo: 0.05
+  err_hi: 0.06
+
+distance:
+  dist_pc: 719.74
+  err_lo: 30.32
+  err_hi: 38.18
+  source: "Gaia EDR3 Bailer-Jones+2021"
+
+spectroscopy:
+  teff: 3227
+  teff_err: 54
+  av: 0.155
+  av_err: 0.060
+  feh_starfish: 0.337
+  feh_starfish_err: 0.123
+
+# No external [Fe/H]: Hayden+2015 solar-annulus disc MDF.
+# The Starfish Z_free posterior peaks near the upper emulator boundary
+# (+0.4 in the old [-0.4,+0.4] bounds), indicating the data prefer a
+# metal-rich solution but cannot constrain it tightly.  The disc MDF
+# prior is adopted for consistency with V1472 Aql (same rationale).
+# NOTE: v10 used the Starfish median (+0.34, 0.12) here, which
+# misrepresented a wide boundary-railed slab as a tight peak.
+feh_prior:
+  kind: truncated_gaussian
+  mu: +0.02
+  sigma: 0.20
+  feh_lo: -1.0
+  feh_hi: +0.5
+  cite: "Hayden et al. (2015)"
+
+# Not needed (no orbit), but required by schema. Set to a broad range.
+companion_prior:
+  kind: flat
+  lo: 0.30
+  hi: 1.44
+
+# Not needed (no orbit).
+incl_prior:
+  kind: isotropic
+  incl_min: 0.0
+  incl_max: 90.0
+
+# No spectroscopic orbit available.
+orbit:
+  has_orbit: false
+
+# Independent comparison mass from Ilkiewicz+2022 (MIST-based from VOSA SED).
+# Not used in inference; stored for display overlay.
+mg_adopted: 2.78
+mg_adopted_err: 0.63          # average of +0.62/-0.64
+mg_adopted_cite: "Ilkiewicz et al. (2022)"
+
+inference:
+  n_samples: 10000000
+  k_neighbors: 16
+  rng_seed: 20260501

@@ -1,0 +1,135 @@
+# FITSYMS configuration: EG And
+# -----------------------------------------------------------------------
+# EG And is a symbiotic binary (M giant + white dwarf) with a well-measured
+# spectroscopic orbit, a UV total eclipse constraining the inclination, and
+# the only high-quality external [Fe/H] in the Gaudin et al. sample
+# (Galan+2023 high-resolution near-IR spectroscopy).
+#
+# Distance: Gaia EDR3 5-parameter solution excluded (RUWE = 1.81, likely
+# contaminated by WD companion UV flux).  Eclipse + bolometric distance
+# adopted from Vogel (1992), consistent with the Kenyon & Garcia (2016)
+# revision.  The Skopal (2005) chain recomputation gives 399 pc, adopted
+# as 400 ± 20 pc (systematic floor on the eclipse method).
+# -----------------------------------------------------------------------
+
+name: "EG And"
+
+# Path to the MIST _full.iso directory.
+# May be absolute or relative to this config file.
+# See README for download instructions.
+mist_dir: "~/.isochrones/mist/MIST_v1.2_vvcrit0.4_full_isos"
+
+# Gardner+2022 MIRC-X wavelength-scale correction factor.
+# Applied as theta_corrected = theta_raw / gardner_factor.
+# All four Gaudin et al. targets were observed pre-correction, so 1.0054.
+gardner_factor: 1.0054
+
+# -----------------------------------------------------------------------
+# Interferometric angular diameter (raw, pre-Gardner correction)
+# From OITOOLS/ultranest LDD fit (CHARA/MIRC-X).
+# The gardner_factor above is applied automatically at load time.
+# -----------------------------------------------------------------------
+angular_diameter:
+  theta_mas: 1.78        # raw LDD angular diameter [mas]
+  err_lo: 0.05           # lower 1-sigma [mas] (positive value)
+  err_hi: 0.08           # upper 1-sigma [mas]
+
+# -----------------------------------------------------------------------
+# Adopted distance
+# Vogel (1992) eclipse + bolometric distance, not Gaia EDR3.
+# err_lo and err_hi are symmetric here (systematic-floor estimate).
+# -----------------------------------------------------------------------
+distance:
+  dist_pc: 400.0
+  err_lo: 20.0
+  err_hi: 20.0
+  source: "Vogel (1992) / Kenyon & Garcia (2016) eclipse+bolometric"
+  note: "Gaia EDR3 5-par excluded: RUWE=1.81, WD UV contamination suspected"
+
+# -----------------------------------------------------------------------
+# Spectroscopic inputs from Starfish MCMC Z_free run
+# teff and teff_err are used as the Teff proposal (Gaussian).
+# feh_starfish and feh_starfish_err are stored for display/sensitivity;
+# the inference uses feh_prior below, not these values.
+# -----------------------------------------------------------------------
+spectroscopy:
+  teff: 3634             # Starfish Z_free posterior median [K]
+  teff_err: 97           # Starfish Z_free posterior std [K]
+  av: 0.108              # visual extinction A_V [mag]
+  av_err: 0.050
+  feh_starfish: -0.054   # Starfish Z_free median [Fe/H] (display only)
+  feh_starfish_err: 0.249
+
+# -----------------------------------------------------------------------
+# [Fe/H] prior for the inference
+#
+# EG And: Galan+2023 (A&A) high-resolution near-IR spectroscopy gives
+# [Fe/H] = -0.54 ± 0.05 (stat); sigma inflated to 0.10 to account for
+# systematics in the near-IR [Fe/H] scale.  This is the only high-quality
+# external [Fe/H] in the sample and disagrees with the Starfish Z_free
+# posterior at ~2 sigma — using the better-constrained external value is
+# the honest choice for the main analysis.
+#
+# Truncated to [feh_lo, feh_hi] = MIST grid bounds to prevent the prior
+# from extending into a region the grid cannot support.
+# -----------------------------------------------------------------------
+feh_prior:
+  kind: truncated_gaussian
+  mu: -0.54              # Galan+2023 spectroscopic [Fe/H]
+  sigma: 0.10            # inflated from 0.05 for systematics
+  feh_lo: -1.0           # MIST grid lower bound (never active at -0.54 ± 0.10)
+  feh_hi: +0.5           # MIST grid upper bound
+  cite: "Galan et al. (2023)"
+
+# -----------------------------------------------------------------------
+# Companion (white dwarf) mass prior
+#
+# EG And companion: WD from UV spectroscopy.  Sion+2017 NLTE logg=7.5
+# gives ~0.45 Msun at 400 pc; Kenyon & Garcia (2016) give [0.35, 0.55].
+# We adopt a broader flat [0.35, 0.60] to avoid implicitly assuming the
+# K&G16 distance is correct when we have adopted a different distance.
+# -----------------------------------------------------------------------
+companion_prior:
+  kind: flat
+  lo: 0.35               # [Msun] — He/low-mass-CO WD lower bound
+  hi: 0.60               # [Msun] — broader than K&G16 to be distance-agnostic
+  cite: "Sion et al. (2017); Kenyon & Garcia (2016)"
+
+# -----------------------------------------------------------------------
+# Inclination prior
+#
+# EG And shows a total UV eclipse, requiring i > ~76 deg (Vogel 1992).
+# The eclipse geometry gives sin(i) ≈ 0.99 ± 0.01 (Vogel 1992), which
+# constrains i to [78, 90] deg.  We use isotropic_truncated (cos i
+# uniform in [cos(90), cos(78)]) as the correct geometric prior for
+# eclipsing systems.
+# -----------------------------------------------------------------------
+incl_prior:
+  kind: isotropic_truncated
+  incl_min: 78.0         # [deg] lower bound from eclipse geometry
+  incl_max: 90.0         # [deg] upper bound
+  cite: "Vogel (1992)"
+
+# -----------------------------------------------------------------------
+# Spectroscopic orbital parameters
+# From Fekel et al. (2000) / Mikolajewska et al. (2013).
+# Circular orbit assumed (ecc = 0, ecc_err = 0).
+# -----------------------------------------------------------------------
+orbit:
+  has_orbit: true
+  fm: 0.019              # mass function f(m) [Msun]
+  fm_err: 0.001          # 1-sigma uncertainty [Msun]
+  period_d: 482.5        # orbital period [days]
+  period_err_d: 1.3      # 1-sigma uncertainty [days]
+  ecc: 0.0               # circular orbit
+  ecc_err: 0.0
+
+# -----------------------------------------------------------------------
+# Inference tuning
+# n_samples: 10_000_000 for published results (main analysis)
+#            1_000_000  for quick tests / sensitivity runs
+# -----------------------------------------------------------------------
+inference:
+  n_samples: 10000000
+  k_neighbors: 16        # kernel-weighted k-NN; k=1 = nearest-node snap
+  rng_seed: 20260501
